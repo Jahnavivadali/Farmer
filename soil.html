@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiAI - AI-Powered Farming Advisory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-green: #2E7D32;
+            --light-green: #4CAF50;
+            --background-green: #F1F8E9;
+            --dark-text: #333;
+            --light-text: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-image: linear-gradient(to bottom, rgba(46, 125, 50, 0.8), rgba(27, 94, 32, 0.9)), url('https://images.pexels.com/photos/235922/pexels-photo-235922.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--dark-text);
+            min-height: 100vh;
+            background-color: #f9fafb;
+        }
+
+        header {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links { list-style: none; display: flex; gap: 2rem; }
+        .nav-links a { text-decoration: none; color: var(--dark-text); font-weight: 600; transition: color 0.3s ease; padding: 5px 0; border-bottom: 2px solid transparent; }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary-green); border-bottom: 2px solid var(--primary-green); }
+        .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+        #language-selector { background: none; border: 1px solid #ccc; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; cursor: pointer; }
+        .profile-link { text-decoration: none; color: var(--dark-text); display: flex; align-items: center; gap: 8px; border: none; background-color: var(--background-green); padding: 0.5rem 1rem; border-radius: 20px; transition: background-color 0.3s; }
+        .profile-link:hover { background-color: #dcedc8; }
+
+        main { padding: 2rem 5%; }
+        .module { display: none; background-color: rgba(255, 255, 255, 0.98); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--box-shadow); animation: fadeIn 0.5s ease-in-out; }
+        .module.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        #home-module { background: none; box-shadow: none; padding: 0; }
+        .hero-section { text-align: center; padding: 4rem 0; color: var(--light-text); }
+        .hero-section h1 { font-size: 3.5rem; margin-bottom: 1rem; }
+        .hero-section p { font-size: 1.2rem; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+        #get-started-btn { background-color: var(--light-text); color: var(--primary-green); border: none; padding: 1rem 2.5rem; font-size: 1.1rem; font-weight: 600; border-radius: 50px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
+        #get-started-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .feature-card { background-color: rgba(255, 255, 255, 0.9); padding: 2rem; border-radius: var(--border-radius); text-align: center; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
+        .feature-card:hover { transform: translateY(-10px); box-shadow: var(--box-shadow); }
+        .feature-card i { font-size: 2.5rem; color: var(--primary-green); margin-bottom: 1rem; }
+
+        .module h2 { text-align: center; margin-bottom: 2rem; font-size: 2.2rem; color: var(--primary-green); }
+        input[type="text"], input[type="email"], textarea, select { width: 100%; padding: 0.8rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 8px; }
+
+        /* AI Advisor Specific */
+        .advisor-container { max-width: 800px; margin: auto; border: 1px solid #ddd; border-radius: var(--border-radius); display: flex; flex-direction: column; height: 60vh; }
+        #chat-output { flex-grow: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+        .message { padding: 0.8rem 1.2rem; border-radius: 20px; max-width: 80%; }
+        .message.user { background-color: var(--primary-green); color: white; align-self: flex-end; border-bottom-right-radius: 5px; }
+        .message.bot { background-color: #e0e0e0; color: var(--dark-text); align-self: flex-start; border-bottom-left-radius: 5px; }
+        .chat-input { display: flex; padding: 0.5rem; border-top: 1px solid #ddd; }
+        #user-query { flex-grow: 1; border: none; padding: 0.8rem; font-size: 1rem; outline: none; }
+        .chat-input button, .input-icon { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--primary-green); padding: 0.8rem; }
+
+        /* Weather Module Specific */
+        .search-bar { display: flex; justify-content: center; max-width: 500px; margin: 0 auto; }
+        #location-input { flex-grow: 1; border-radius: 50px 0 0 50px; border-right: none; outline: none; padding: 0.8rem; }
+        #get-weather-btn { border-radius: 0 50px 50px 0; border: 1px solid #ccc; background-color: var(--primary-green); color: white; cursor: pointer; padding: 0 1.5rem; }
+        #weather-results { margin-top: 2rem; text-align: center; background-color: var(--background-green); padding: 1.5rem; border-radius: var(--border-radius); }
+        
+        /* Feedback Form Specific */
+        .feedback-form { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+        .feedback-form button { background-color: var(--primary-green); color: white; padding: 1rem; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; }
+        
+        /* NEW SOIL ANALYSIS STYLES */
+        .soil-analysis-container { max-width: 800px; margin: 0 auto; }
+        .soil-tabs-list { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
+        .soil-tab-trigger { padding: 0.8rem; cursor: pointer; border: none; background-color: #f9fafb; font-weight: 500; color: #6b7280; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .soil-tab-trigger.active { background-color: var(--primary-green); color: white; }
+        .soil-tab-content { display: none; margin-top: 1.5rem; }
+        .soil-tab-content.active { display: block; }
+        .soil-card { background-color: #fff; border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .soil-card h3, .soil-card-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .soil-card p, .soil-card-desc { color: #6b7280; margin-bottom: 1rem; }
+        .soil-card label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .soil-card button { background-color: var(--primary-green); color: white; width: 100%; border: none; padding: 0.8rem; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: background-color 0.3s; }
+        .soil-card button:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        .soil-card-grid-2 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        .soil-image-preview { width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 1rem; }
+
+        .soil-result-card { margin-top: 1.5rem; }
+        .soil-result-card .soil-card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .badge { display: inline-block; padding: 0.25em 0.6em; font-size: 0.85em; font-weight: 600; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.375rem; }
+        .badge-outline { border: 1px solid currentColor; background-color: transparent; }
+        .badge-secondary { background-color: #e5e7eb; color: #374151; }
+        .badge-green { background-color: #d1fae5; color: #065f46; }
+        .badge-orange { border-color: #fdba74; color: #c2410c; }
+        .separator { height: 1px; background-color: var(--border-color); margin: 1.5rem 0; }
+        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .result-list { list-style: disc; list-style-position: inside; margin-top: 0.5rem; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo"><i class="fa-solid fa-leaf"></i> <span data-translate-key="logo_text">KrishiAI</span></div>
+            <ul class="nav-links">
+                <li><a href="#" class="nav-item active" data-module="home" data-translate-key="nav_home">Home</a></li>
+                <li><a href="#" class="nav-item" data-module="ai-advisor" data-translate-key="nav_ai_advisor">AI Advisor</a></li>
+                <li><a href="#" class="nav-item" data-module="soil-analysis" data-translate-key="nav_soil_analysis">Soil Analysis</a></li>
+                <li><a href="#" class="nav-item" data-module="weather" data-translate-key="nav_weather">Weather</a></li>
+                <li><a href="#" class="nav-item" data-module="feedback" data-translate-key="nav_feedback">Feedback</a></li>
+            </ul>
+            <div class="nav-right">
+                <select id="language-selector">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="te">తెలుగు</option>
+                    <option value="ta">தமிழ்</option>
+                    <option value="kn">ಕನ್ನಡ</option>
+                    <option value="ml">മലയാളം</option>
+                </select>
+                <a href="#" class="profile-link"><i class="fa-solid fa-user"></i> <span data-translate-key="nav_profile">Profile</span></a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home-module" class="module active">
+             <div class="hero-section">
+                <h1 data-translate-key="hero_title">AI-Powered Farming Advisory</h1>
+                <p data-translate-key="hero_subtitle">Get expert advice, analyze your soil, check weather, and connect with the farming community.</p>
+                <button id="get-started-btn" data-translate-key="get_started">Get Started →</button>
+            </div>
+             <div class="features-grid">
+                <div class="feature-card" data-module="ai-advisor"><i class="fa-solid fa-brain"></i><h3 data-translate-key="card_ai_title">AI Advisor</h3><p data-translate-key="card_ai_desc">Get instant AI-powered advice for all your farming questions.</p></div>
+                <div class="feature-card" data-module="soil-analysis"><i class="fa-solid fa-flask-vial"></i><h3 data-translate-key="card_soil_title">Soil Analysis</h3><p data-translate-key="card_soil_desc">Upload soil images or enter details to get a complete analysis.</p></div>
+                <div class="feature-card" data-module="weather"><i class="fa-solid fa-cloud-sun"></i><h3 data-translate-key="card_weather_title">Weather</h3><p data-translate-key="card_weather_desc">Real-time weather data and forecasts for your location.</p></div>
+                <div class="feature-card" data-module="feedback"><i class="fa-solid fa-comments"></i><h3 data-translate-key="card_feedback_title">Feedback</h3><p data-translate-key="card_feedback_desc">Help us improve by providing your valuable feedback.</p></div>
+            </div>
+        </section>
+
+        <section id="ai-advisor-module" class="module">
+             <h2 data-translate-key="ai_advisor_title">Ask the AI Advisor</h2>
+            <div class="advisor-container">
+                <div id="chat-output"><div class="message bot"><p data-translate-key="ai_welcome_msg">Hello! How can I help you with your farm today?</p></div></div>
+                <div class="chat-input">
+                    <input type="text" id="user-query" placeholder="Type your question...">
+                    <label for="image-upload" class="input-icon"><i class="fa-solid fa-image"></i></label>
+                    <input type="file" id="image-upload" accept="image/*" class="hidden">
+                    <button id="ask-voice-btn" class="input-icon"><i class="fa-solid fa-microphone"></i></button>
+                    <button id="ask-text-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <section id="soil-analysis-module" class="module">
+            <div class="soil-analysis-container">
+                <div style="text-align: center;">
+                    <h2 data-translate-key="soilAnalysis" style="margin-bottom: 0.5rem;">Soil Analysis</h2>
+                    <p data-translate-key="soilAnalysisDescription" style="color: #6b7280;">Get detailed soil reports by uploading an image or selecting soil type and location.</p>
+                </div>
+
+                <div class="soil-tabs" style="margin-top: 2rem;">
+                    <div class="soil-tabs-list">
+                        <button class="soil-tab-trigger active" data-tab="image"><i class="fa-solid fa-camera"></i> <span data-translate-key="imageAnalysis">Image Analysis</span></button>
+                        <button class="soil-tab-trigger" data-tab="location"><i class="fa-solid fa-map-pin"></i> <span data-translate-key="locationAnalysis">Location Analysis</span></button>
+                    </div>
+
+                    <div id="soil-tab-image" class="soil-tab-content active">
+                        <div class="soil-card">
+                            <h3 class="soil-card-title"><i class="fa-solid fa-upload"></i> <span data-translate-key="uploadSoilImage">Upload Soil Image</span></h3>
+                            <p class="soil-card-desc" data-translate-key="uploadSoilImageDescription">For best results, use a clear, well-lit photo of the soil.</p>
+                            <input type="file" id="soil-image-input" accept="image/*">
+                            <div id="soil-image-preview-container" class="hidden" style="margin-top: 1rem;">
+                                <img id="soil-image-preview" src="" alt="Soil Preview" class="soil-image-preview">
+                                <button id="analyze-soil-image-btn" style="margin-top: 1rem;" data-translate-key="analyzeSoil">Analyze Soil</button>
+                            </div>
+                        </div>
+                        <div id="image-analysis-results"></div>
+                    </div>
+
+                    <div id="soil-tab-location" class="soil-tab-content">
+                        <div class="soil-card">
+                             <h3 class="soil-card-title"><i class="fa-solid fa-map-pin"></i> <span data-translate-key="locationSoilAnalysis">Location & Soil Analysis</span></h3>
+                             <p class="soil-card-desc" data-translate-key="locationSoilAnalysisDescription">Select your soil type and enter your location for a report.</p>
+                            <div class="soil-card-grid-2">
+                                <div>
+                                    <label for="soil-type-select" data-translate-key="selectSoilType">Select Soil Type</label>
+                                    <select id="soil-type-select">
+                                        <option value="" data-translate-key="chooseSoilType">-- Choose Soil Type --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="soil-location-input" data-translate-key="enterLocation">Enter Your Location</label>
+                                    <input type="text" id="soil-location-input" data-translate-key-placeholder="locationPlaceholder" placeholder="e.g., Penamaluru, Andhra Pradesh">
+                                </div>
+                            </div>
+                            <button id="analyze-soil-location-btn" style="margin-top: 1rem;" data-translate-key="analyzeLocationSoil">Analyze Location & Soil</button>
+                        </div>
+                        <div id="location-analysis-results"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="weather-module" class="module">
+             <h2 data-translate-key="weather_title">Weather Report</h2>
+            <div class="search-bar">
+                <input type="text" id="location-input" placeholder="Enter a City Name...">
+                <button id="get-weather-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+            <div id="weather-results"></div>
+        </section>
+        
+        <section id="feedback-module" class="module">
+            <h2 data-translate-key="feedback_title">Provide Your Feedback</h2>
+            <form class="feedback-form">
+                <input type="text" data-translate-key-placeholder="feedback_name" placeholder="Your Name">
+                <input type="email" data-translate-key-placeholder="feedback_email" placeholder="Your Email">
+                <textarea rows="5" data-translate-key-placeholder="feedback_message" placeholder="Your feedback..."></textarea>
+                <button type="submit" data-translate-key="submit_btn">Submit Feedback</button>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- CONFIGURATION ---
+            const WEATHER_API_KEY = 'YOUR_API_KEY_HERE'; // <-- IMPORTANT: PASTE YOUR KEY HERE
+
+            // --- SOIL DATABASE (Simulated) ---
+            const soilDatabase = {
+                "Alluvial Soil": {
+                    name: "Alluvial Soil", ph: "6.5 - 7.5", texture: "Loamy",
+                    npk: { nitrogen: 1.5, phosphorus: 0.8, potassium: 2.0 },
+                    suitableForFarming: true,
+                    recommendedCrops: ["Rice", "Wheat", "Sugarcane", "Cotton", "Jute", "Maize"],
+                    pesticides: [],
+                    tips: ["Ensure good drainage to prevent waterlogging.", "Organic matter enrichment is beneficial."],
+                    warnings: ["Prone to nutrient leaching in sandy variants."]
+                },
+                "Black Soil": {
+                    name: "Black Soil", ph: "7.2 - 8.5", texture: "Clayey",
+                    npk: { nitrogen: 1.0, phosphorus: 0.9, potassium: 2.5 },
+                    suitableForFarming: true,
+                    recommendedCrops: ["Cotton", "Soybean", "Jowar", "Wheat", "Sunflower"],
+                    pesticides: ["Neem Oil for initial pest control"],
+                    tips: ["Requires deep tillage before monsoon.", "High water retention capacity, manage irrigation carefully."],
+                    warnings: ["Develops deep cracks in summer, which can damage roots."]
+                },
+                "Red Soil": {
+                    name: "Red Soil", ph: "5.5 - 7.0", texture: "Sandy to Loamy",
+                    npk: { nitrogen: 0.8, phosphorus: 0.7, potassium: 1.5 },
+                    suitableForFarming: true,
+                    recommendedCrops: ["Groundnut", "Millets (Ragi)", "Pulses", "Tobacco", "Potato"],
+                    pesticides: [],
+                    tips: ["Responds well to fertilizers and irrigation.", "Lime application can correct high acidity."],
+                    warnings: ["Low in essential nutrients and organic matter."]
+                },
+                "Laterite Soil": {
+                    name: "Laterite Soil", ph: "4.5 - 5.5", texture: "Gravelly",
+                    npk: { nitrogen: 0.5, phosphorus: 0.5, potassium: 1.0 },
+                    suitableForFarming: false,
+                    recommendedCrops: ["Cashew", "Tea", "Coffee", "Rubber (with heavy manuring)"],
+                    pesticides: [],
+                    tips: ["Heavy use of manures and fertilizers is essential for cultivation.", "Suitable for plantation crops rather than seasonal ones."],
+                    warnings: ["Very acidic and poor in nutrients due to intense leaching."]
+                }
+            };
+
+            // --- TRANSLATION DATA ---
+            const translations = {
+                 en: {
+                    logo_text: "KrishiAI", nav_home: "Home", nav_ai_advisor: "AI Advisor", nav_soil_analysis: "Soil Analysis", nav_weather: "Weather", nav_feedback: "Feedback", nav_profile: "Profile", hero_title: "AI-Powered Farming Advisory", hero_subtitle: "Get expert advice, analyze your soil, check weather, and connect with the farming community.", get_started: "Get Started →", card_ai_title: "AI Advisor", card_ai_desc: "Get instant AI-powered advice for all your farming questions.", card_soil_title: "Soil Analysis", card_soil_desc: "Upload soil images or enter details to get a complete analysis.", card_weather_title: "Weather", card_weather_desc: "Real-time weather data and forecasts for your location.", card_feedback_title: "Feedback", card_feedback_desc: "Help us improve by providing your valuable feedback.", ai_advisor_title: "Ask the AI Advisor", ai_welcome_msg: "Hello! How can I help you with your farm today?", soilAnalysis: "Soil Analysis", soilAnalysisDescription: "Get detailed soil reports by uploading an image or selecting soil type and location.", imageAnalysis: "Image Analysis", locationAnalysis: "Location Analysis", uploadSoilImage: "Upload Soil Image", uploadSoilImageDescription: "For best results, use a clear, well-lit photo of the soil.", analyzeSoil: "Analyze Soil", locationSoilAnalysis: "Location & Soil Analysis", locationSoilAnalysisDescription: "Select your soil type and enter your location for a report.", selectSoilType: "Select Soil Type", chooseSoilType: "-- Choose Soil Type --", enterLocation: "Enter Your Location", locationPlaceholder: "e.g., Penamaluru, Andhra Pradesh", analyzeLocationSoil: "Analyze Location & Soil", soilAnalysisResults: "Soil Analysis Results", confidence: "Confidence", soilType: "Soil Type", phLevel: "pH Level", soilTexture: "Soil Texture", npkValues: "NPK Values", farmingSuitability: "Farming Suitability", suitableForFarming: "Suitable for Farming", notSuitableForFarming: "Not Ideal for Farming", recommendedCrops: "Recommended Crops", recommendedPesticides: "Recommended Pesticides", farmingTips: "Farming Tips", analyzing: "Analyzing...", weather_title: "Weather Report", feedback_title: "Provide Your Feedback", submit_btn: "Submit Feedback", feedback_name: "Your Name", feedback_email: "Your Email", feedback_message: "Your feedback..."
+                },
+                hi: {
+                    logo_text: "कृषिAI", nav_home: "होम", nav_ai_advisor: "एआई सलाहकार", nav_soil_analysis: "मृदा विश्लेषण", nav_weather: "मौसम", nav_feedback: "प्रतिक्रिया", nav_profile: "प्रोफ़ाइल", hero_title: "एआई-संचालित कृषि सलाहकार", hero_subtitle: "विशेषज्ञ सलाह प्राप्त करें, अपनी मिट्टी का विश्लेषण करें, मौसम की जाँच करें और कृषक समुदाय से जुड़ें।", get_started: "शुरू करें →", card_ai_title: "एआई सलाहकार", card_ai_desc: "अपने सभी कृषि प्रश्नों के लिए तुरंत एआई-संचालित सलाह प्राप्त करें।", card_soil_title: "मृदा विश्लेषण", card_soil_desc: "पूर्ण विश्लेषण प्राप्त करने के लिए मिट्टी की छवियां अपलोड करें या विवरण दर्ज करें।", card_weather_title: "मौसम", card_weather_desc: "आपके स्थान के लिए वास्तविक समय का मौसम डेटा और पूर्वानुमान।", card_feedback_title: "प्रतिक्रिया", card_feedback_desc: "अपनी बहुमूल्य प्रतिक्रिया देकर हमें बेहतर बनाने में मदद करें।", ai_advisor_title: "एआई सलाहकार से पूछें", ai_welcome_msg: "नमस्ते! आज मैं आपके खेत में कैसे मदद कर सकता हूँ?", soilAnalysis: "मृदा विश्लेषण", soilAnalysisDescription: "एक छवि अपलोड करके या मिट्टी का प्रकार और स्थान चुनकर विस्तृत मिट्टी रिपोर्ट प्राप्त करें।", imageAnalysis: "छवि विश्लेषण", locationAnalysis: "स्थान विश्लेषण", uploadSoilImage: "मिट्टी की छवि अपलोड करें", uploadSoilImageDescription: "सर्वोत्तम परिणामों के लिए, मिट्टी की एक स्पष्ट, अच्छी रोशनी वाली तस्वीर का उपयोग करें।", analyzeSoil: "मिट्टी का विश्लेषण करें", locationSoilAnalysis: "स्थान और मिट्टी विश्लेषण", locationSoilAnalysisDescription: "एक रिपोर्ट के लिए अपने मिट्टी का प्रकार चुनें और अपना स्थान दर्ज करें।", selectSoilType: "मिट्टी का प्रकार चुनें", chooseSoilType: "-- मिट्टी का प्रकार चुनें --", enterLocation: "अपना स्थान दर्ज करें", locationPlaceholder: "जैसे, पेनामलुरु, आंध्र प्रदेश", analyzeLocationSoil: "स्थान और मिट्टी का विश्लेषण करें", soilAnalysisResults: "मृदा विश्लेषण के परिणाम", confidence: "आत्मविश्वास", soilType: "मिट्टी का प्रकार", phLevel: "पीएच स्तर", soilTexture: "मिट्टी की बनावट", npkValues: "एनपीके मान", farmingSuitability: "खेती की उपयुक्तता", suitableForFarming: "खेती के लिए उपयुक्त", notSuitableForFarming: "खेती के लिए आदर्श नहीं", recommendedCrops: "अनुशंसित फसलें", recommendedPesticides: "अनुशंसित कीटनाशक", farmingTips: "खेती के टिप्स", analyzing: "विश्लेषण हो रहा है...", weather_title: "मौसम रिपोर्ट", feedback_title: "अपनी प्रतिक्रिया दें", submit_btn: "प्रतिक्रिया भेजें", feedback_name: "आपका नाम", feedback_email: "आपका ईमेल", feedback_message: "आपकी प्रतिक्रिया..."
+                },
+                // Add translations for te, ta, kn, ml here...
+            };
+            
+            // --- GENERAL FUNCTIONS & SETUP ---
+            const languageSelector = document.getElementById('language-selector');
+            const navItems = document.querySelectorAll('.nav-item');
+            const featureCards = document.querySelectorAll('.feature-card');
+            const modules = document.querySelectorAll('.module');
+            
+            const changeLanguage = (lang) => {
+                const langData = translations[lang] || translations['en'];
+                document.querySelectorAll('[data-translate-key]').forEach(el => {
+                    const key = el.getAttribute('data-translate-key');
+                    if (langData[key]) el.textContent = langData[key];
+                });
+                document.querySelectorAll('[data-translate-key-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-translate-key-placeholder');
+                    if (langData[key]) el.placeholder = langData[key];
+                });
+            };
+
+            const showModule = (moduleId) => {
+                modules.forEach(module => module.classList.remove('active'));
+                document.getElementById(`${moduleId}-module`).classList.add('active');
+                navItems.forEach(item => item.classList.toggle('active', item.dataset.module === moduleId));
+            };
+
+            languageSelector.addEventListener('change', (e) => changeLanguage(e.target.value));
+            navItems.forEach(item => item.addEventListener('click', (e) => { e.preventDefault(); showModule(e.target.dataset.module); }));
+            featureCards.forEach(card => card.addEventListener('click', (e) => showModule(e.currentTarget.dataset.module)));
+            document.getElementById('get-started-btn').addEventListener('click', () => showModule('ai-advisor'));
+
+            // --- INITIALIZATION ---
+            changeLanguage('en');
+            showModule('home');
+
+            // --- MODULE-SPECIFIC LOGIC ---
+            setupAiAdvisor();
+            setupWeatherModule();
+            setupSoilAnalysisModule(); // New setup function
+
+            // ===================================
+            // NEW SOIL ANALYSIS MODULE LOGIC
+            // ===================================
+            function setupSoilAnalysisModule() {
+                const tabTriggers = document.querySelectorAll('.soil-tab-trigger');
+                const tabContents = document.querySelectorAll('.soil-tab-content');
+                const soilTypeSelect = document.getElementById('soil-type-select');
+                const imageInput = document.getElementById('soil-image-input');
+                const imagePreviewContainer = document.getElementById('soil-image-preview-container');
+                const imagePreview = document.getElementById('soil-image-preview');
+                const analyzeImageBtn = document.getElementById('analyze-soil-image-btn');
+                const analyzeLocationBtn = document.getElementById('analyze-soil-location-btn');
+                const locationInput = document.getElementById('soil-location-input');
+                const imageResultsContainer = document.getElementById('image-analysis-results');
+                const locationResultsContainer = document.getElementById('location-analysis-results');
+
+                // Populate soil type dropdown
+                const soilTypes = Object.keys(soilDatabase);
+                soilTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    soilTypeSelect.appendChild(option);
+                });
+
+                // Tab switching
+                tabTriggers.forEach(trigger => {
+                    trigger.addEventListener('click', () => {
+                        tabTriggers.forEach(t => t.classList.remove('active'));
+                        trigger.classList.add('active');
+                        tabContents.forEach(c => c.classList.remove('active'));
+                        document.getElementById(`soil-tab-${trigger.dataset.tab}`).classList.add('active');
+                    });
+                });
+                
+                // Image upload handling
+                imageInput.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            imagePreview.src = e.target.result;
+                            imagePreviewContainer.classList.remove('hidden');
+                        };
+                        reader.readAsDataURL(file);
+                        imageResultsContainer.innerHTML = ''; // Clear previous results
+                    }
+                });
+                
+                // Analyze Image Button
+                analyzeImageBtn.addEventListener('click', () => {
+                    analyzeImageBtn.disabled = true;
+                    analyzeImageBtn.textContent = translations[languageSelector.value].analyzing || "Analyzing...";
+                    imageResultsContainer.innerHTML = `<p>${translations[languageSelector.value].analyzing || "Analyzing..."}</p>`;
+                    
+                    setTimeout(() => {
+                        const randomSoil = soilTypes[Math.floor(Math.random() * soilTypes.length)];
+                        const result = {
+                            ...soilDatabase[randomSoil],
+                            confidence: Math.floor(Math.random() * 20) + 80
+                        };
+                        renderSoilResult(result, imageResultsContainer, true);
+                        analyzeImageBtn.disabled = false;
+                        analyzeImageBtn.textContent = translations[languageSelector.value].analyzeSoil || "Analyze Soil";
+                    }, 2000);
+                });
+
+                // Analyze Location Button
+                analyzeLocationBtn.addEventListener('click', () => {
+                     const selectedSoil = soilTypeSelect.value;
+                     const location = locationInput.value.trim();
+
+                     if (!selectedSoil || !location) {
+                         alert('Please select a soil type and enter a location.');
+                         return;
+                     }
+
+                    analyzeLocationBtn.disabled = true;
+                    analyzeLocationBtn.textContent = translations[languageSelector.value].analyzing || "Analyzing...";
+                    locationResultsContainer.innerHTML = `<p>${translations[languageSelector.value].analyzing || "Analyzing..."}</p>`;
+
+                    setTimeout(() => {
+                        const result = soilDatabase[selectedSoil];
+                        renderSoilResult(result, locationResultsContainer, false);
+                        analyzeLocationBtn.disabled = false;
+                        analyzeLocationBtn.textContent = translations[languageSelector.value].analyzeLocationSoil || "Analyze Location & Soil";
+                    }, 2000);
+                });
+
+            }
+
+            function renderSoilResult(result, container, isImage) {
+                const lang = languageSelector.value;
+                const t = (key) => translations[lang][key] || translations['en'][key];
+                
+                const suitabilityClass = result.suitableForFarming ? "text-green-700" : "text-red-700";
+                const suitabilityIcon = result.suitableForFarming ? `<i class="fa-solid fa-check-circle" style="color: green;"></i>` : `<i class="fa-solid fa-triangle-exclamation" style="color: red;"></i>`;
+
+                const pesticidesHTML = result.pesticides && result.pesticides.length > 0 ? `
+                    <div>
+                        <label>${t('recommendedPesticides')}</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                            ${result.pesticides.map(p => `<span class="badge badge-orange">${p}</span>`).join('')}
+                        </div>
+                    </div>
+                ` : '';
+                
+                const tipsHTML = result.tips && result.tips.length > 0 ? `
+                    <div>
+                        <label>${t('farmingTips')}</label>
+                        <ul class="result-list">
+                            ${result.tips.map(tip => `<li>${tip}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : '';
+
+                 const html = `
+                    <div class="soil-card soil-result-card">
+                        <div class="soil-card-header">
+                            <div>
+                                <h3 class="soil-card-title"><i class="fa-solid fa-leaf" style="color: var(--primary-green);"></i> ${t('soilAnalysisResults')}</h3>
+                                ${isImage ? `<p class="soil-card-desc">${t('confidence')}: ${result.confidence}%</p>` : ''}
+                            </div>
+                            <button class="input-icon" title="Listen to summary"><i class="fa-solid fa-volume-high"></i></button>
+                        </div>
+                        <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
+                            <div class="result-grid">
+                                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                    <div>
+                                        <label>${t('soilType')}</label>
+                                        <p style="font-size: 1.2rem; font-weight: 600; color: var(--primary-green);">${result.name}</p>
+                                    </div>
+                                    <div class="result-grid">
+                                        <div><label>${t('phLevel')}</label><p>${result.ph}</p></div>
+                                        <div><label>${t('soilTexture')}</label><p>${result.texture}</p></div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                    <div>
+                                        <label>${t('farmingSuitability')}</label>
+                                        <p>${suitabilityIcon} ${result.suitableForFarming ? t('suitableForFarming') : t('notSuitableForFarming')}</p>
+                                    </div>
+                                    <div>
+                                        <label>${t('npkValues')}</label>
+                                        <div style="display: flex; gap: 0.5rem; margin-top: 0.25rem;">
+                                            <span class="badge badge-outline">N: ${result.npk.nitrogen}%</span>
+                                            <span class="badge badge-outline">P: ${result.npk.phosphorus}%</span>
+                                            <span class="badge badge-outline">K: ${result.npk.potassium}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="separator"></div>
+                             <div>
+                                <label>${t('recommendedCrops')}</label>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                                    ${result.recommendedCrops.map(crop => `<span class="badge badge-green">${crop}</span>`).join('')}
+                                </div>
+                            </div>
+                            ${pesticidesHTML}
+                            ${tipsHTML}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML = html;
+            }
+
+            // ===================================
+            // AI ADVISOR MODULE LOGIC
+            // ===================================
+            function setupAiAdvisor() { /* ... AI Advisor logic from previous code ... */ }
+
+            // ===================================
+            // WEATHER MODULE LOGIC
+            // ===================================
+            function setupWeatherModule() { /* ... Weather logic from previous code ... */ }
+        });
+    </script>
+</body>
+</html>
